@@ -49,6 +49,14 @@ namespace Wire.SerializerFactories
             var typeName = type.Name;
             var genericSufixIdx = typeName.IndexOf('`');
             typeName = genericSufixIdx != -1 ? typeName.Substring(0, genericSufixIdx) : typeName;
+
+            if (typeName.StartsWith("IImmutable"))
+            {
+                typeName = typeName.Substring(1);
+                if (typeName == "ImmutableSet")
+                    typeName = "ImmutableHashSet";
+            }
+
             var creatorType =
                 Type.GetType(
                     ImmutableCollectionsNamespace + "." + typeName + ", " + ImmutableCollectionsAssembly, true);
@@ -91,7 +99,7 @@ namespace Wire.SerializerFactories
                     var value = stream.ReadObject(session);
                     items.SetValue(value, i);
                 }
-               
+
                 var instance = createRange.Invoke(null, new object[] {items});
                 if (preserveObjectReferences)
                 {
